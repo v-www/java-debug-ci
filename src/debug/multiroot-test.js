@@ -6,26 +6,27 @@ import { ROOT, LANGUAGE_SERVER_ROOT, LANGUAGE_SERVER_WORKSPACE } from './constan
 import fs from 'fs'
 import { assert } from 'chai'
 import { execSync } from 'child_process'
-
+let petclinicpro;
+let todopro;
 describe('MultiRoot test', () => {
     let config;
     let DATA_ROOT;
     let debugEngine;
     const projectPath = path.join(ROOT, "25.multi-root");
-    config = new MultiRoot();
-    if (!fs.existsSync(projectPath)) {
-        console.log("****", "Clone project");
-        let downloadCmd = `cd ${ROOT}` + '&& mkdir 25.multi-root' + '&& cd 25.multi-root' + '&& git clone https://github.com/spring-projects/spring-petclinic.git';
-        let downloadCmd1 = `cd ${projectPath}` + '&& git clone https://github.com/Microsoft/todo-app-java-on-azure.git';
-        execSync(downloadCmd, { stdio: [0, 1, 2] });
-        if (fs.existsSync(projectPath)) {
-            execSync(downloadCmd1, { stdio: [0, 1, 2] });
-        }
-        console.log("****", "Clone finished");
-    }
-    const petclinicpro = path.join(config.petclinicPath, '.project');
-    const todopro = path.join(config.todoPath, '.project')
     beforeEach(function () {
+        config = new MultiRoot();
+        petclinicpro = path.join(config.petclinicPath, '.project');
+        todopro = path.join(config.todoPath, '.project');
+        if (!fs.existsSync(projectPath)) {
+            console.log("****", "Clone project");
+            let downloadCmd = `cd ${ROOT}` + '&& mkdir 25.multi-root' + '&& cd 25.multi-root' + '&& git clone https://github.com/spring-projects/spring-petclinic.git';
+            let downloadCmd1 = `cd ${projectPath}` + '&& git clone https://github.com/Microsoft/todo-app-java-on-azure.git';
+            execSync(downloadCmd, { stdio: [0, 1, 2] });
+            if (fs.existsSync(projectPath)) {
+                execSync(downloadCmd1, { stdio: [0, 1, 2] });
+            }
+            console.log("****", "Clone finished");
+        }
         assert(!(fs.existsSync(petclinicpro) || fs.existsSync(todopro)));
         this.timeout(1000 * 20);
         (async () => {
@@ -37,6 +38,9 @@ describe('MultiRoot test', () => {
     });
     it('should pass MultiRoot test.', function () {
         this.timeout(1000 * 50);
+        (async ()=>{
+            console.log("MultiRoot test started");
+        })();
         console.log("MultiRoot test started");
     });
 });
@@ -66,8 +70,8 @@ class MultiRoot {
     withEngine(engine) {
         utils.timeout(1000 * 50);
         assert((fs.existsSync(petclinicpro) && fs.existsSync(todopro)));
-        assert(config.data.length === 2);
-        for (let result of config.data) {
+        assert(this.data.length === 2);
+        for (let result of this.data) {
             if (result.mainClass === "org.springframework.samples.petclinic.PetClinicApplication") {
                 assert(result.projectName === "spring-petclinic");
             }
